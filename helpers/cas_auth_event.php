@@ -94,6 +94,7 @@ class cas_auth_event
       $new_user = identity::lookup_user_by_name($cas_user_name);
       if ($new_user == null) {
         Kohana_Log::add("info", "Could not authenticate user '$cas_user_name': No matching user found in gallery database");
+        return;
       }
 
       try {
@@ -102,6 +103,14 @@ class cas_auth_event
         Kohana_Log::add("error", "Couldn't authenticate as $cas_user_name: " .
           $e->getMessage() . "\n" . $e->getTraceAsString());
       }
+
+      if (identity::is_writable()) {
+        $new_user->login_count += 1;
+        $new_user->last_login = time();
+        $new_user->save();
+      }
+
+      module::event("user_login", $user);
     }
   }
 }
