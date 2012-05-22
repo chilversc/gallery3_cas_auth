@@ -10,10 +10,10 @@ class CAS_Controller extends Controller
 
   function logout()
   {
-    $user = identity_Core::active_user();
-    if (!$user->guest) {
+    if (cas_auth::is_logged_in()) {
       access::verify_csrf();
       auth::logout();
+      phpCAS::logout();
     }
     url::redirect(item::root()->abs_url());
   }

@@ -27,4 +27,10 @@ class cas_auth_Core
     module::set_var("cas_auth", "cas_port", $settings->port);
     module::set_var("cas_auth", "cas_context", $settings->context);
   }
+
+  static function is_logged_in()
+  {
+    $user = identity::active_user();
+    return ($user != null && !$user->guest) || phpCAS::isAuthenticated();
+  }
 }

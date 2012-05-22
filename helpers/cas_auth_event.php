@@ -23,21 +23,19 @@ class cas_auth_event
     $menu->remove("user_menu_login");
     $menu->remove("user_menu_logout");
 
-    $user = identity::active_user();
-
-    if ($user->guest) {
-      $menu->append(Menu::factory("link")
-        ->id("user_menu_login")
-        ->css_id("g-login-link")
-        ->url(url::site("cas/login"))
-        ->label(t("Login")));
-    } else {
+    if (cas_auth::is_logged_in()) {
       $csrf = access::csrf_token();
       $menu->append(Menu::factory("link")
         ->id("user_menu_logout")
         ->css_id("g-logout-link")
         ->url(url::site("cas/logout?csrf=$csrf"))
         ->label(t("Logout")));
+    } else {
+      $menu->append(Menu::factory("link")
+        ->id("user_menu_login")
+        ->css_id("g-login-link")
+        ->url(url::site("cas/login"))
+        ->label(t("Login")));
     }
   }
 
