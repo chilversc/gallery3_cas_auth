@@ -59,6 +59,7 @@ class cas_auth_event
 
   static function post_authenticate_callback()
   {
+    self::_clear_missing_user();
     self::_sign_in_user_from_cas();
   }
 
@@ -89,11 +90,7 @@ class cas_auth_event
     $user = identity::active_user();
 
     if ($user->guest || $user->name != $cas_user_name) {
-      $new_user = identity::lookup_user_by_name($cas_user_name);
-      if ($new_user == null) {
-        Kohana_Log::add("info", "Could not authenticate user '$cas_user_name': No matching user found in gallery database");
-        return;
-      }
+      $new_user = self::_find_user($cas_user_name, true);
 
       try {
         identity::set_active_user($new_user);
@@ -110,5 +107,29 @@ class cas_auth_event
 
       module::event("user_login", $user);
     }
+  }
+
+  private static function _find_user($name)
+  {
+    $user = identity::lookup_user_by_name($name);
+    if ($user != null)
+      return $user;
+
+    // suppress repeatedly raising cas_auth_missing_user event every request for the same user.
+    $missing = session::instance()->get("cas_auth_missing_user", null);
+    if ($name == $missing)
+      return null;
+
+    Kohana_Log::add("info", "Could not authenticate user '$name': No matching user found in gallery database");
+    session::instance()->set("cas_auth_missing_user", $name);
+    module::event("cas_auth_missing_user", $name);
+
+    $user = identity::lookup_user_by_name($name);
+    return $user;
+  }
+
+  private static function _clear_missing_user()
+  {
+    session::instance()->delete("cas_auth_missing_user");
   }
 }
