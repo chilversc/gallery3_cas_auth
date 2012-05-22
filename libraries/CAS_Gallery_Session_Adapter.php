@@ -24,18 +24,18 @@ class CAS_Gallery_Session_Adapter implements CAS_Session_SessionHandler
       $this->session = Session::instance();
   }
 
-  function start($id = null)
+  function start($ticket = null)
   {
-    if ($id !== null)
-      $id = $this->_sanatizeId($id);
+    if ($ticket !== null)
+      $ticket = $this->_sanatizeId($ticket);
 
     if ($this->session !== null)
-      $this->session->create(null, $id);
+      $this->session->create(null, $ticket);
     else
-      $this->session = Session::instance($id);
+      $this->session = Session::instance($ticket);
   }
 
-  function rename($id)
+  function rename($ticket)
   {
     phpCAS :: trace("Skipping session rename gallery3 adapter does not support it.");
   }
