@@ -128,14 +128,14 @@ class cas_auth_event
 
   private static function _find_user($name)
   {
-    $user = identity::lookup_user_by_name($name);
-    if ($user != null)
-      return $user;
-
     // suppress repeatedly raising cas_auth_missing_user event every request for the same user.
     $missing = session::instance()->get("cas_auth_missing_user", null);
     if ($name == $missing)
       return null;
+
+    $user = identity::lookup_user_by_name($name);
+    if ($user != null)
+      return $user;
 
     Kohana_Log::add("info", "Could not authenticate user '$name': No matching user found in gallery database");
     session::instance()->set("cas_auth_missing_user", $name);
