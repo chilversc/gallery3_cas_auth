@@ -27,8 +27,27 @@ class cas_auth_event
   {
     if (!cas_auth::is_enabled())
       return;
+
     self::_init_cas();
-    phpCAS::checkAuthentication();
+    phpCAS::handleLogoutRequests();
+  }
+
+  static function system_post_routing()
+  {
+    if (!cas_auth::is_enabled())
+      return;
+
+    // Do not apply CAS authentication to rest requests as these have their own authentication handling using API keys.
+    if (Router::$controller == "rest")
+      return;
+
+    // Only issue checkAuthentication for get requests because it can cause a redirect to CAS to verify the token
+    // This should be OK, because of single sign out should destroy the session when the user logs out causing
+    // isAuthenticated to return false. Also the token is only valid for a limited length of time before it needs
+    // to be verified with the CAS server.
+    if (request::method() == "get")
+      phpCAS::checkAuthentication();
+
     self::_sync_cas_auth_with_gallery();
   }
 
@@ -95,8 +114,6 @@ class cas_auth_event
 
     phpCAS::setPostAuthenticateCallback(array("cas_auth_event", "post_authenticate_callback"));
     phpCAS::setSessionHandler(new CAS_Gallery_Session_Adapter());
-
-    phpCAS::handleLogoutRequests();
   }
 
   private static function _sync_cas_auth_with_gallery()
