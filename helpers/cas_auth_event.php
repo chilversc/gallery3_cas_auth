@@ -70,6 +70,7 @@ class cas_auth_event
   {
     if (!cas_auth::is_enabled())
       return;
+    self::_clear_missing_user();
     phpCAS::logout();
   }
 
