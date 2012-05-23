@@ -29,7 +29,7 @@ class cas_auth_event
       return;
     self::_init_cas();
     phpCAS::checkAuthentication();
-    self::_sign_in_user_from_cas();
+    self::_sync_cas_auth_with_gallery();
   }
 
   static function user_menu($menu, $theme)
@@ -77,7 +77,7 @@ class cas_auth_event
   static function post_authenticate_callback()
   {
     self::_clear_missing_user();
-    self::_sign_in_user_from_cas();
+    self::_sync_cas_auth_with_gallery();
   }
 
 
@@ -98,31 +98,40 @@ class cas_auth_event
     phpCAS::handleLogoutRequests();
   }
 
-  private static function _sign_in_user_from_cas()
+  private static function _sync_cas_auth_with_gallery()
   {
-    if (!phpCAS::isAuthenticated())
-      return;
+    if (phpCAS::isAuthenticated()) {
+      self::_sign_in_gallery_user();
+    } else {
+      self::_sign_out_gallery_user();
+    }
+  }
 
+  private static function _sign_in_gallery_user()
+  {
+    $current_user = identity::active_user();
     $cas_user_name = phpCAS::getUser();
-    $user = identity::active_user();
 
-    if ($user->guest || $user->name != $cas_user_name) {
+    if ($current_user->guest) {
       $new_user = self::_find_user($cas_user_name, true);
-
-      try {
-        identity::set_active_user($new_user);
-      } catch (Exception $e) {
-        Kohana_Log::add("error", "Couldn't authenticate as $cas_user_name: " .
-          $e->getMessage() . "\n" . $e->getTraceAsString());
+      if ($new_user != null)
+        auth::login($new_user);
+    } else if ($current_user->name != $cas_user_name) {
+      $new_user = self::_find_user($cas_user_name, true);
+      if ($new_user == null) {
+        self::_sign_out_gallery_user();
+      } else {
+        auth::login($new_user);
       }
+    }
+  }
 
-      if (identity::is_writable()) {
-        $new_user->login_count += 1;
-        $new_user->last_login = time();
-        $new_user->save();
-      }
-
-      module::event("user_login", $user);
+  private static function _sign_out_gallery_user()
+  {
+    $isGuest = identity::active_user()->guest;
+    if (!$isGuest) {
+      auth::logout();
+      url::redirect(item::root()->abs_url());
     }
   }
 
