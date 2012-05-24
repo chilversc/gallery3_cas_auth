@@ -22,11 +22,6 @@ class CAS_Gallery_Session_Adapter implements CAS_Session_SessionHandler
   private $session = null;
 
 
-  function hasSession()
-  {
-    return $this->session !== null;
-  }
-
   function id()
   {
     if ($this->session === null)
