@@ -49,7 +49,14 @@ class CAS_Gallery_Session_Adapter implements CAS_Session_SessionHandler
 
   function rename($ticket)
   {
-    phpCAS :: trace("Skipping session rename gallery3 adapter does not support it.");
+    $id = $this->_sanatizeId($ticket);
+    $oldSession = $_SESSION;
+
+    $this->open();
+    $this->session->create(null, $id);
+
+    $_SESSION = $oldSession;
+    $_SESSION["session_id"] = $id;
   }
 
   function destroy()
