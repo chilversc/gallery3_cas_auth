@@ -36,15 +36,10 @@ class CAS_Gallery_Session_Adapter implements CAS_Session_SessionHandler
       $this->session = Session::instance();
   }
 
-  function start($ticket = null)
+  function openSpecificSession($ticket)
   {
-    if ($ticket !== null)
-      $ticket = $this->_sanatizeId($ticket);
-
-    if ($this->session !== null)
-      $this->session->create(null, $ticket);
-    else
-      $this->session = Session::instance($ticket);
+    $ticket = $this->_sanatizeId($ticket);
+    $this->session = Session::instance($ticket);
   }
 
   function rename($ticket)
