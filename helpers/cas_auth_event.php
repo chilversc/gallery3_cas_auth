@@ -19,14 +19,15 @@
 
 class cas_auth_event
 {
-  static function system_ready()
-  {
-  }
+  // Record if system.post_routing was handled in case Gallery3 starts forwarding system events in future versions
+  private static $post_routing_handled = false;
 
   static function gallery_ready()
   {
     if (!cas_auth::is_enabled())
       return;
+
+    Event::add("system.post_routing", array("cas_auth_event", "system_post_routing"));
 
     self::_init_cas();
     phpCAS::handleLogoutRequests();
@@ -34,8 +35,13 @@ class cas_auth_event
 
   static function system_post_routing()
   {
+    if (self::$post_routing_handled)
+      return;
+
     if (!cas_auth::is_enabled())
       return;
+
+    self::$post_routing_handled = true;
 
     // Do not apply CAS authentication to rest requests as these have their own authentication handling using API keys.
     if (Router::$controller == "rest")
