@@ -19,6 +19,9 @@
 
 class CAS_Controller extends Controller
 {
+  const ALLOW_MAINTENANCE_MODE = true;
+  const ALLOW_PRIVATE_GALLERY = true;
+
   function login()
   {
     phpCAS::forceAuthentication();
