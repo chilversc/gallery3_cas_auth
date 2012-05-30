@@ -15,6 +15,7 @@ Limitations
 Gallery3 password is.
 * Gallery3 user accounts still need a password, even though the users will not be using Gallery3 to authenticate.
 * Replaces 404 error page to remove login form, other modules/themes that replace the 404 page may conflict.
+* Replaces login_ajax page to remove login form, other modules/themes that replace this page may conflict.
 
 Troubleshooting
 ====
