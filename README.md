@@ -12,10 +12,13 @@ Limitations
 ====
 
 * The admin re-authentication is disabled while using the cas_auth plugin since the user probably won't know what their
-Gallery3 password is.
+  Gallery3 password is. For security, it's advisable to have separate user/administrator accounts.
 * Gallery3 user accounts still need a password, even though the users will not be using Gallery3 to authenticate.
 * Replaces 404 error page to remove login form, other modules/themes that replace the 404 page may conflict.
 * Replaces login_ajax page to remove login form, other modules/themes that replace this page may conflict.
+* Extends auth_Core, so will not work with other modules that also extend auth_Core
+* Performs some session management, hooks in early in the pipeline before sessions have been loaded.
+  Other modules that hook in early and load a session will cause problems.
 
 Troubleshooting
 ====
