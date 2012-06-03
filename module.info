@@ -3,3 +3,5 @@ description = "Gallery 3 CAS integration"
 version     = 1
 author_name = "infinite Group"
 author_url  = "http://infinitegroup.co.uk"
+info_url    = "http://codex.gallery2.org/Gallery3:Modules:cas_auth"
+discuss_url = "https://github.com/chilversc/gallery3_cas_auth/issues"
