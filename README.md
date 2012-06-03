@@ -19,6 +19,16 @@ Limitations
 * Extends auth_Core, so will not work with other modules that also extend auth_Core
 * Performs some session management, hooks in early in the pipeline before sessions have been loaded.
   Other modules that hook in early and load a session will cause problems.
+* Currently only supports SAML Version 1.1, need to add settings to allow selecting other protocols.
+* Currently does not support CAS proxies, need to add settings to allow configuring a proxy.
+
+TODO
+====
+* Add support for other protocols (this just needs a drop down in the settings, and someone with an appropriate CAS server to test the change).
+* Add support for CAS proxies, not sure on what's required; I have not used CAS in a proxy configuration.
+* Add feature to test set-up before enabling (would be nice to ensure you're not about to lock yourself out).
+* A nicer settings page wouldn't hurt.
+* Confirmation prompt before enabling/disabling.
 
 Troubleshooting
 ====
